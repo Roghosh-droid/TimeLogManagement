@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="loginForm">
+        <label for="userLoginId">User Login ID:</label>
+        <input type="text" id="userLoginId" name="userLoginId" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        // Function to handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Retrieve user login ID and password
+            const userLoginId = document.getElementById('userLoginId').value;
+            const password = document.getElementById('password').value;
+
+            // Prepare login data
+            const loginData = {
+                userLoginId: userLoginId,
+                password: password
+            };
+
+            // Send POST request to backend login API
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Set content type to JSON
+                },
+                body: JSON.stringify(loginData) // Convert login data to JSON string
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Invalid username or password');
+                }
+                return response.text();
+            })
+            .then(message => {
+                // Check if login was successful and user has admin or userrole role
+                if (message.includes('Login successful') && message.includes('admin')) {
+                	alert('Login successful. User has admin role.');
+                	// Redirect to the upload page
+                    window.location.href = '/upload-page.html'; // Replace with the actual URL of your upload page
+                } else if (message.includes('Login successful') && message.includes('userrole')) {
+                	alert('Login successful. User has user role.');
+                    window.location.href = '/fetch.html'; // Replace with the actual URL of your fetch page
+                } else {
+                    throw new Error('User has no role');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message); // Display error message to the user
+            });
+        });
+    </script>
+</body>
+</html>
